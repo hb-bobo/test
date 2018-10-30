@@ -4,6 +4,8 @@ import BaseNode from './canvas/BaseNode';
 
 
 let index = 1;
+
+// 声明一个场景
 const scence = new Scence('#container');
 
 
@@ -13,6 +15,7 @@ function random (m, n){
 const shape = new Circle();
 
 for(let i = 0; i < 500; i++) {
+    // 创建一个元素
     const circle = new BaseNode(shape);
     circle.attr({
         x: random(0, window.innerWidth),
@@ -34,6 +37,7 @@ for(let i = 0; i < 500; i++) {
             color: '#0b23da'
         });
     });
+    // 添加到场景中
     scence.append(circle);
 }
 
