@@ -6,14 +6,15 @@ function getDefaultAttr() {
         x: 0,
         y: 0,
         zIndex: 0,
+        zOrder: 0,
     }
 }
 
-class Attr{
+export default class Attr{
     constructor(attr) {
-        this._attr = ;
+        this._attr = getDefaultAttr();
         if (utils.isObject(attr)) {
-            this._attr = Object.assign(getDefaultAttr(), attr);
+            Object.assign(this._attr, attr);
         }
     }
 
@@ -29,9 +30,9 @@ class Attr{
         }
         if (utils.isString(props)) {
             if (value === undefined) {
-                return this.getAttr(attrType);
+                return this.getAttr(props);
             }
-            return this.setAttr(attrType, value);
+            return this.setAttr(props, value);
         }
     }
 
@@ -46,6 +47,6 @@ class Attr{
      * @param {any} value 
      */
     setAttr(attrType, value) {
-        this._attr = value;
+        this._attr[attrType] = value;
     }
 }

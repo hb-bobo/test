@@ -2,10 +2,11 @@
 import Attr from './Attr';
 import * as utils from './utils';
 
+let zOrder = 0;
 /**
  * 节点
  */
-class BaseNode {
+export default class BaseNode {
     /**
      * 
      * @param {Shape} shape 
@@ -17,10 +18,16 @@ class BaseNode {
         this._attr = attr || new Attr(attr);
         this._chid = [];
     }
-    append(node) {
+
+    attr(prop, value) {
+        return this._attr.attr(prop, value);
+    }
+    append(node, drawingContext) {
         if (!(node instanceof BaseNode)) {
             throw Error(`Failed to execute 'append' on 'Node': parameter 1 is not of type 'Node'`);
         }
+        node.ctx = drawingContext || this.drawingContext;
+        node.attr('zOrder', ++zOrder);
         this._chid.push(node);
         this.render();
     }
@@ -54,16 +61,27 @@ class BaseNode {
         hanlders.splice(index, 1);
     }
 
-
-    render(drawingContext) {
+    /**
+     * 
+     * @param {string} eventType 
+     */
+    dispatchEvent(eventType) {
+        let hanlders = this._evnetHanlders[eventType];
+        if (Array.isArray(hanlders)) {
+            hanlders.forEach(fn => {
+                fn();
+            });
+        }
+    }
+    render(ctx = this.ctx ) {
         if (this._shape && this._shape.render) {
-            this._shape.render(drawingContext, this._attr);
+            this._shape.render(ctx, this._attr);
         }
         // 如果扩展此功能，待优化
         if (this._chid.length > 0) {
             let sortedChild = utils.sortOrderedChild(this._chid);
-            sortedChild.forEach(function(childNode) {
-                childNode.render(drawingContext, this._attr);
+            sortedChild.forEach((childNode) => {
+                childNode.render(ctx, this._attr);
             });
         }
     }
