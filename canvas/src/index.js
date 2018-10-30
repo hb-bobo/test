@@ -1,20 +1,41 @@
 import Scence from './canvas/Scene';
 import Circle from './canvas/Circle';
 import BaseNode from './canvas/BaseNode';
-let scence = new Scence('#container', {
-    viewport: [window.innerWidth, window.innerHeight],
-});
-console.log(scence)
 
-let circle = new BaseNode(new Circle());
-circle.attr({
-    x: 10,
-    y: 10,
-    color: '#900',
-    r: 10
-});
-scence.append(circle);
 
-circle.on('click', function(target){
-    console.log(target)
-});
+let index = 1;
+const scence = new Scence('#container');
+
+
+function random (m, n){
+    return Math.floor(Math.random() * (m - n) + n);
+}
+const shape = new Circle();
+
+for(let i = 0; i < 500; i++) {
+    const circle = new BaseNode(shape);
+    circle.attr({
+        x: random(0, window.innerWidth),
+        y: random(0, window.innerHeight),
+        color: '#808efd',
+        r: random(10, 30)
+    });
+    // 加事件
+    circle.on('click', function(ev){
+        const target = ev.target;
+        scence.child.forEach(chid => {
+            chid.attr({
+                color: '#808efd'
+            });
+        });
+
+        target.attr({
+            zIndex: ++index,
+            color: '#0b23da'
+        });
+    });
+    scence.append(circle);
+}
+
+
+

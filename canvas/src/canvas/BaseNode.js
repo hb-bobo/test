@@ -16,19 +16,34 @@ export default class BaseNode {
         this._evnetHanlders = {};
         this._shape = shape;
         this._attr = attr || new Attr(attr);
-        this._chid = [];
+        this.child = [];
+        // scene时
+        if (shape instanceof CanvasRenderingContext2D) {
+            this.ctx = shape;
+        }
     }
 
-    attr(prop, value) {
-        return this._attr.attr(prop, value);
+    attr(props, value) {
+        // get
+        if (utils.isString(props) && value === undefined) {
+            return this._attr.attr(props, value);
+        }
+        //set
+        this._attr.attr(props, value);
+
+        if (this.ctx) {
+            this.render();
+        }
+        return;
     }
-    append(node, drawingContext) {
+    append(node, ctx) {
         if (!(node instanceof BaseNode)) {
             throw Error(`Failed to execute 'append' on 'Node': parameter 1 is not of type 'Node'`);
         }
-        node.ctx = drawingContext || this.drawingContext;
+        node.parent = node;
+        node.ctx = ctx || this.ctx;
         node.attr('zOrder', ++zOrder);
-        this._chid.push(node);
+        this.child.push(node);
         this.render();
     }
     removeChild() {
@@ -66,27 +81,37 @@ export default class BaseNode {
      * @param {string} eventType 
      */
     dispatchEvent(evtArgs) {
-        console.log(11, this)
         let hanlders = this._evnetHanlders[evtArgs.type];
 
-        if (Array.isArray(hanlders)) {
-            hanlders.forEach(fn => {
-                fn(evtArgs);
-            });
-        }
-        if (Array.isArray(this._chid) && this._chid.length > 0) {
-            this._chid.forEach(childNode => {
+        if (Array.isArray(this.child) && this.child.length > 0) {
+            this.child.forEach(childNode => {
                 childNode.dispatchEvent(evtArgs);
             });
         }
+        if (Array.isArray(hanlders)) {
+            hanlders.forEach(fn => {
+                const isCollisionWithCircle = utils.isCollisionWithCircle(
+                    this.attr('x'),
+                    this.attr('y'),
+                    this.attr('r'),
+                    evtArgs.x,
+                    evtArgs.y
+                );
+                if (isCollisionWithCircle) {
+                    evtArgs.target = this;
+                    fn(evtArgs);
+                }
+            });
+        }
+        
     }
     render(ctx = this.ctx ) {
         if (this._shape && this._shape.render) {
             this._shape.render(ctx, this._attr);
         }
         // 如果扩展此功能，待优化
-        if (this._chid.length > 0) {
-            let sortedChild = utils.sortOrderedChild(this._chid);
+        if (this.child.length > 0) {
+            let sortedChild = utils.sortOrderedChild(this.child);
             sortedChild.forEach((childNode) => {
                 childNode.render(ctx, this._attr);
             });

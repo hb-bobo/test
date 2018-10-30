@@ -16,67 +16,52 @@ export default  class Scene extends BaseNode{
      * @param {Object} opts 
      */
     constructor(container, opts) {
-        super();
-        this.container = getContainer(container);
-        this.ctx = this.container.getContext("2d");
-        this.viewport = opts.viewport;
-        this.updateViewport();
+        const canvas = getContainer(container);
+        const ctx = canvas.getContext("2d");
+        super(ctx);
+        this.canvas = canvas;
+        this.ctx = ctx;
+        this.type = 'Scence';
+        this.resize();
 
-        window.addEventListener('resize', this.resize);
-
+        window.addEventListener('resize', this.resize.bind(this));
+        // 给canvas加事件
         const events = ['click'];
         events.forEach(event => this.delegateEvent(event));
-        this.container.addEventListener('DOMNodeRemovedFromDocument', () => {
-            window.removeEventListener('resize', his.resize);
+
+        this.canvas.addEventListener('DOMNodeRemovedFromDocument', () => {
+            window.removeEventListener('resize', this.resize);
         });
     }
+
     /**
      * 委托事件
      * @param {string} event 
      */
     delegateEvent(event) {
-        this.container.addEventListener(event, (e) => {
+        this.canvas.addEventListener(event, (e) => {
             const evtArgs = {
                 originalEvent: e,
                 type: event,
+                x: e.offsetX,
+                y: e.offsetY,
                 stopDispatch() {
                     this.terminated = true;
                 },
             };
-            this._chidispatchEvent(evtArgs);
+            this.child.forEach(childNode => {
+                childNode.dispatchEvent(evtArgs);
+            });
         });
     }
     resize() {
-        
-    }
-    
-    // clearCanvas() {
-    //     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-    // }
-    updateViewport() {
-        const [width, height] = this.viewport;
-        const canvas = this.container;
-        const w = container.clientWidth;
-        const h = container.clientHeight;
-        canvas.width = w;
-        canvas.height = h;
+        const canvas = this.canvas;
+        const w = window.innerWidth;
+        const h = window.innerHeight;
         canvas.style.width = w + 'px';
         canvas.style.height = h + 'px';
-        console.log(w)
-        // canvas.style.width = `${width}px`;
-        // canvas.style.height = `${height}px`;
-        return;
-        const dpr = window.devicePixelRatio || 1;
-        const ratio = this.ctx.webkitBackingStorePixelRatio || this.ctx.backingStorePixelRatio;
-        const r = dpr / ratio;
-        if (dpr !== ratio) {
-            const w = this.ctx.width;
-            const h = this.ctx.height;
-            canvas.width = w * r;
-            canvas.height = h * r;
-            canvas.style.width = `${w}px`;
-            canvas.style.height = `${h}px`;
-            canvas.scale(r, r);
-        }
+        canvas.width = w;
+        canvas.height = h;
+        this.render(this.ctx);
     }
 }

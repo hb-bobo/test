@@ -21,7 +21,7 @@ export const sortOrderedChild = function (nodes, reversed = false) {
 
 
 /**
- * 
+ * ⚪的碰撞检测
  * @param {number} x 全局坐标x
  * @param {number} y 
  * @param {number} r 半径
