@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack'); 
 const HtmlWebpackPlugin = require('html-webpack-plugin'); //installed via npm
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 function resolve(dir) {
     return path.resolve(__dirname, dir);
@@ -35,8 +35,12 @@ module.exports = {
         ]
     },
     devServer: devServer,
+    // optimization: {
+    //     minimizer: [new UglifyJsPlugin()]
+    // },
     plugins: [
         new HtmlWebpackPlugin({ template: 'src/index.html' }),
         new webpack.HotModuleReplacementPlugin(),
+        new UglifyJsPlugin(),
     ]
 }; 
