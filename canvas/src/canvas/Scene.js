@@ -43,7 +43,7 @@ export default  class Scene extends BaseNode{
                     this.terminated = true;
                 },
             };
-            this.dispatchEvent(evtArgs);
+            this._chidispatchEvent(evtArgs);
         });
     }
     resize() {
