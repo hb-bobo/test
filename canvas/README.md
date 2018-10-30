@@ -2,10 +2,8 @@
 
 ```js
 let index = 1;
-
 // 声明一个场景
 const scence = new Scence('#container');
-
 
 function random (m, n){
     return Math.floor(Math.random() * (m - n) + n);
