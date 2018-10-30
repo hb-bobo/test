@@ -30,7 +30,10 @@ export default  class Scene extends BaseNode{
             window.removeEventListener('resize', his.resize);
         });
     }
-
+    /**
+     * 委托事件
+     * @param {string} event 
+     */
     delegateEvent(event) {
         this.container.addEventListener(event, (e) => {
             const evtArgs = {
@@ -40,7 +43,7 @@ export default  class Scene extends BaseNode{
                     this.terminated = true;
                 },
             };
-            this.dispatchEvent(event);
+            this.dispatchEvent(evtArgs);
         });
     }
     resize() {

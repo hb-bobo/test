@@ -62,14 +62,21 @@ export default class BaseNode {
     }
 
     /**
-     * 
+     * 分发事件
      * @param {string} eventType 
      */
-    dispatchEvent(eventType) {
-        let hanlders = this._evnetHanlders[eventType];
+    dispatchEvent(evtArgs) {
+        console.log(11, this)
+        let hanlders = this._evnetHanlders[evtArgs.type];
+
         if (Array.isArray(hanlders)) {
             hanlders.forEach(fn => {
-                fn();
+                fn(evtArgs);
+            });
+        }
+        if (Array.isArray(this._chid) && this._chid.length > 0) {
+            this._chid.forEach(childNode => {
+                childNode.dispatchEvent(evtArgs);
             });
         }
     }
