@@ -81,28 +81,28 @@ export default class BaseNode {
      * @param {string} eventType 
      */
     dispatchEvent(evtArgs) {
-        let hanlders = this._evnetHanlders[evtArgs.type];
-
+        const hanlders = this._evnetHanlders[evtArgs.type];
+        const isCollisionWithCircle = utils.isCollisionWithCircle(
+            this.attr('x'),
+            this.attr('y'),
+            this.attr('r'),
+            evtArgs.x,
+            evtArgs.y
+        );
         if (Array.isArray(this.child) && this.child.length > 0) {
             this.child.forEach(childNode => {
                 childNode.dispatchEvent(evtArgs);
             });
         }
-        if (Array.isArray(hanlders)) {
-            hanlders.forEach(fn => {
-                const isCollisionWithCircle = utils.isCollisionWithCircle(
-                    this.attr('x'),
-                    this.attr('y'),
-                    this.attr('r'),
-                    evtArgs.x,
-                    evtArgs.y
-                );
-                if (isCollisionWithCircle) {
-                    evtArgs.target = this;
+        if (isCollisionWithCircle && ['click'].includes(evtArgs.target)) {
+            evtArgs.target = this;
+            if (Array.isArray(hanlders)) {
+                hanlders.forEach(fn => {
                     fn(evtArgs);
-                }
-            });
+                });
+            }
         }
+        
         
     }
     render(ctx = this.ctx ) {
